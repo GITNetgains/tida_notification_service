@@ -33,6 +33,10 @@ admin.initializeApp({
 const server = express();
 const axios = require("axios");
 
+server.get("/", (req, res) => {
+  res.status(200).json({"message": "Server is working"});
+})
+
 server.post("/partner_notification", express.json(), async (req, res) => {
   const { userid } = req.body;
   try {
