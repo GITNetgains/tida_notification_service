@@ -48,7 +48,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
       }
     );
     const fcmToken = response.data.data.fcm_token;
-    console.log(fcmToken);
+    // console.log(fcmToken);
     const message = {
       token: fcmToken,
       notification: {
@@ -56,23 +56,23 @@ server.post("/partner_notification", express.json(), async (req, res) => {
         body: "You have recevied a payment from a Tida customer ",
       },
     };
-    await admin.messaging().send(message).then((res) => {
+
+    await admin.messaging().send(message).then((responseFCM) => {
       // Response is a message ID string.
-      console.log("FCM notification sent successfully:", res);
-      logger.info(res);
+      // console.log("FCM notification sent successfully:", responseFCM);
+      logger.info(responseFCM);
       res.status(200).json({ message: "FCM notification sent successfully" });
-    })
-      .catch((error) => {
-        console.error("Error sending FCM notification:", error);
+    }).catch((error) => {
+        // console.error("Error sending FCM notification:", error);
         logger.error({
           "error": error,
-          "response_from_fcm": res,
+          "response_from_fcm": responseFCM,
           "response_from_server": response
         })
         res.status(500).json({ error: "Error sending FCM notification", "details": error });
       });
   } catch (error) {
-    console.error("An error occurred while making the API request:", error);
+    // console.error("An error occurred while making the API request:", error);
     logger.error({
       "error": error
     });
@@ -88,7 +88,8 @@ cron.schedule("* * * * *", async () => {
       "https://tidasports.com/secure/api/notification/get_booking_details",
       {}
     );
-    console.log("Response from API:", response.data);
+    // console.log("Response from API:", response.data);
+    logger.info("Response from API:", response.data);
     const bookingDetails = response.data.data;
     const currentTime = new Date();
 
@@ -115,7 +116,7 @@ cron.schedule("* * * * *", async () => {
           };
           admin.messaging().send(message, (err, res) => {
             if (err) {
-              console.error("Error sending FCM notification:", err);
+              // console.error("Error sending FCM notification:", err);
               logger.error({
                 "error": err,
                 "response_from_fcm": res,
@@ -135,10 +136,11 @@ cron.schedule("* * * * *", async () => {
     }
   } catch (error) {
     logger.error(error);
-    console.error("An error occurred while making the API request:", error);
+    // console.error("An error occurred while making the API request:", error);
   }
 });
 
 server.listen(5001, () => {
-  console.log("Server is running on port 5001");
+  // console.log("Server is running on port 5001");
+  logger.info("Server is running on port 5001");
 });
