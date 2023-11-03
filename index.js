@@ -34,11 +34,18 @@ const server = express();
 const axios = require("axios");
 
 server.get("/", (req, res) => {
-  res.status(200).json({"message": "Server is working"});
+  res.status(200).json({ "message": "Server is working" });
+})
+
+server.post("/check", (req, res) => {
+  console.log(req.body);
 })
 
 server.post("/partner_notification", express.json(), async (req, res) => {
+  console.log(req.body);
   const { userid, fcmToken } = req.body;
+  console.log(userid);
+  console.log(fcmToken);
   try {
     const form = new FormData();
     form.append("userid", userid);
@@ -61,45 +68,59 @@ server.post("/partner_notification", express.json(), async (req, res) => {
       },
     };
 
-    await admin.messaging().send(message).then((responseFCM) => {
-      // Response is a message ID string.
-      // console.log("FCM notification sent successfully:", responseFCM);
-      logger.info(responseFCM);
-      res.status(200).json({ message: "FCM notification sent successfully" });
-    }).catch((error) => {
-        // console.error("Error sending FCM notification:", error);
-        logger.error({
-          "error": error,
-          "response_from_fcm": responseFCM,
-          "response_from_server": response
-        })
-        res.status(500).json({ error: "Error sending FCM notification", "details": error });
-      });
+    // try {
+    //   await admin.messaging().send(message)
+    //     .then((responseFCM) => {
+    //       // Response is a message ID string.
+    //       // console.log("FCM notification sent successfully:", responseFCM);
+    //       // logger.info(responseFCM);
+    //       res.status(200).json({ message: "FCM notification sent successfully" });
+    //     }).catch((error) => {
+    //       console.error("Error sending FCM notification:", error.message);
+    //       logger.error({
+    //         "error": error,
+    //         // "response_from_fcm": responseFCM,
+    //         "response_from_server": response
+    //       })
+    //       res.status(500).json({ error: "Error sending FCM notification", "details": error.message });
+    //     });
+    // } catch (e) {
+    //   console.log(e);
+    //   res.status(500).json({ error: "Error sending FCM notification", "details": error });
+    // }
 
       const message1 = {
-        token: fcmToken,
-        notification: {
-          title: "Payment Update",
-          body: "You booking was successful ",
-        },
-      };
+      token: fcmToken,
+      notification: {
+        title: "Payment Update",
+        body: "You booking was successful ",
+      },
+    };
 
+    console.log(message1);
+
+    try {
       await admin.messaging().send(message1).then((responseFCM) => {
         // Response is a message ID string.
         // console.log("FCM notification sent successfully:", responseFCM);
         logger.info(responseFCM);
         res.status(200).json({ message: "FCM notification sent successfully" });
       }).catch((error) => {
-          // console.error("Error sending FCM notification:", error);
-          logger.error({
-            "error": error,
-            "response_from_fcm": responseFCM,
-            "response_from_server": response
-          })
-          res.status(500).json({ error: "Error sending FCM notification", "details": error });
-        });
+        // console.error("Error sending FCM notification:", error);
+        logger.error({
+          "error": error,
+          // "response_from_fcm": responseFCM,
+          "response_from_server": response
+        })
+        res.status(500).json({ error: "Error sending FCM notification", "details": error });
+      });
+    } catch (e) {
+      console.log(e);
+      res.status(500).json({ error: "Error sending FCM notification", "details": error });
+    }
+
   } catch (error) {
-    // console.error("An error occurred while making the API request:", error);
+    console.error("An error occurred while making the API request:", error);
     logger.error({
       "error": error
     });
