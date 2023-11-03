@@ -64,7 +64,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
       token: fcm_token,
       notification: {
         title: "Payment Update",
-        body: "You have recevied a payment from a Tida customer ",
+        body: "You have received a payment from a Tida customer ",
       },
     };
 
