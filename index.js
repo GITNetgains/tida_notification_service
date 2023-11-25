@@ -42,11 +42,7 @@ server.post("/check", (req, res) => {
 })
 
 server.post("/partner_notification", express.json(), async (req, res) => {
-  console.log(req.body);
   const { userid, fcmToken, order_id } = req.body;
-  console.log(userid);
-  console.log(fcmToken);
-  console.log(order_id);
   try {
     const form = new FormData();
     form.append("userid", userid);
@@ -59,41 +55,51 @@ server.post("/partner_notification", express.json(), async (req, res) => {
         },
       }
     );
-    const fcm_token = response.data.data.fcm_token;
-    // console.log(fcmToken);
-    const message = {
-      token: fcm_token,
-      notification: {
-        title: "Payment Update",
-        body: "You have received a payment from a Tida customer ",
-      },
-      data: {
-        click_action: "FLUTTER_NOTIFICATION_CLICK",
-        sound: "default",
-        order_id: order_id.toString()
-      }
-    };
 
-    try {
-      await admin.messaging().send(message)
-        .then((responseFCM) => {
-          // Response is a message ID string.
-          // console.log("FCM notification sent successfully:", responseFCM);
-          // logger.info(responseFCM);
-          // res.status(200).json({ message: "FCM notification sent successfully" });
-        }).catch((error) => {
-          console.error("Error sending FCM notification:", error.message);
-          logger.error({
-            "error": error.message,
-            // "response_from_fcm": responseFCM,
-            "response_from_server": response
-          })
-          res.status(500).json({ error: "Error sending FCM notification", "details": error.message });
-        });
-    } catch (e) {
-      console.log(e.message);
-      res.status(500).json({ error: "Error sending FCM notification", "details": error });
+    let fcm_token = response.data.data.fcm_token;
+    
+    if(!Array.isArray(fcm_token)) {
+      fcm_token = [fcm_token];
     }
+
+    for(let partner_token of fcm_token) {
+      const message = {
+        token: partner_token,
+        notification: {
+          title: "Payment Update",
+          body: "You have received a payment from a Tida customer ",
+        },
+        data: {
+          click_action: "FLUTTER_NOTIFICATION_CLICK",
+          sound: "default",
+          order_id: order_id.toString()
+        }
+      };
+  
+      console.log(message);
+  
+      try {
+        await admin.messaging().send(message)
+          .then((responseFCM) => {
+            // Response is a message ID string.
+            // console.log("FCM notification sent successfully:", responseFCM);
+            logger.info(responseFCM);
+            // res.status(200).json({ message: "FCM notification sent successfully" });
+          }).catch((error) => {
+            console.error("Error sending FCM notification:", error.message);
+            logger.error({
+              "error": error.message,
+              // "response_from_fcm": responseFCM,
+              "response_from_server": response
+            })
+            res.status(500).json({ error: "Error sending FCM notification", "details": error.message });
+          });
+      } catch (e) {
+        console.log(e.message);
+        res.status(500).json({ error: "Error sending FCM notification", "details": error });
+      }
+    }
+
     const message1 = {
       token: fcmToken,
       notification: {
@@ -107,7 +113,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
       }
     };
 
-    console.log(message1);
+    // console.log(message1);
 
     try {
       await admin.messaging().send(message1).then((responseFCM) => {
