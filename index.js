@@ -92,11 +92,11 @@ server.post("/partner_notification", express.json(), async (req, res) => {
               // "response_from_fcm": responseFCM,
               "response_from_server": response
             })
-            res.status(500).json({ error: "Error sending FCM notification", "details": error.message });
+            // res.status(500).json({ error: "Error sending FCM notification", "details": error.message });
           });
       } catch (e) {
         console.log(e.message);
-        res.status(500).json({ error: "Error sending FCM notification", "details": error });
+        // res.status(500).json({ error: "Error sending FCM notification", "details": e.message });
       }
     }
 
@@ -175,7 +175,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
         // Response is a message ID string.
         // console.log("FCM notification sent successfully:", responseFCM);
         logger.info(responseFCM);
-        res.status(200).json({ message: "FCM notification sent successfully" });
+        // res.status(200).json({ message: "FCM notification sent successfully" });
       }).catch((error) => {
         // console.error("Error sending FCM notification:", error);
         logger.error({
@@ -183,11 +183,11 @@ server.post("/partner_notification", express.json(), async (req, res) => {
           // "response_from_fcm": responseFCM,
           // "response_from_server": response
         })
-        res.status(500).json({ error: "Error sending FCM notification", "details": error });
+        // res.status(500).json({ error: "Error sending FCM notification", "details": error });
       });
     } catch (e) {
       console.log(e.message);
-      res.status(500).json({ error: "Error sending FCM notification", "details": e });
+      // res.status(500).json({ error: "Error sending FCM notification", "details": e });
     }
 
   } catch (error) {
@@ -199,6 +199,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
       .status(500)
       .json({ error: "An error occurred while making the API request" });
   }
+  res.status(200).json({ message: "FCM notification sent successfully" });
 });
 
 cron.schedule("* * * * *", async () => {
