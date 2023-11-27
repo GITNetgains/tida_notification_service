@@ -90,7 +90,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
             logger.error({
               "error": error.message,
               // "response_from_fcm": responseFCM,
-              "response_from_server": response
+              // "response_from_server": response
             })
             // res.status(500).json({ error: "Error sending FCM notification", "details": error.message });
           });
