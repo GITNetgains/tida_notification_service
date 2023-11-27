@@ -146,7 +146,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
             logger.error({
               "error": error.message,
               // "response_from_fcm": responseFCM,
-              "response_from_server": response
+              // "response_from_server": response
             })
           });
       } catch (e) {
@@ -193,7 +193,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
   } catch (error) {
     console.error("An error occurred while making the API request:", error);
     logger.error({
-      "error": error
+      "error": error.message
     });
     res
       .status(500)
