@@ -101,7 +101,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
     }
 
     const customerForm = new FormData();
-    form.append("userid", userid);
+    form.append("userid", customerUserId);
     const customerResponse = await axios.post(
       "https://tidasports.com/secure/api/notification/find_fcm_token",
       form,
@@ -123,7 +123,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
         token: customer_token,
         notification: {
           title: "Payment Update",
-          body: "You have received a payment from a Tida customer ",
+          body: "You booking was successful ",
         },
         data: {
           click_action: "FLUTTER_NOTIFICATION_CLICK",
@@ -191,7 +191,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
     }
 
   } catch (error) {
-    console.error("An error occurred while making the API request:", error);
+    console.error("An error occurred while making the API request:", error.message);
     logger.error({
       "error": error.message
     });
@@ -255,7 +255,7 @@ cron.schedule("* * * * *", async () => {
       }
     }
   } catch (error) {
-    logger.error(error);
+    logger.error(error.message);
     // console.error("An error occurred while making the API request:", error);
   }
 });
