@@ -104,7 +104,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
     form.append("userid", customerUserId);
     const customerResponse = await axios.post(
       "https://tidasports.com/secure/api/notification/find_fcm_token",
-      form,
+      customerForm,
       {
         headers: {
           ...form.getHeaders(),
@@ -112,7 +112,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
       }
     );
 
-    let customer_fcm_token = response.data.data.fcm_token;
+    let customer_fcm_token = customerResponse.data.data.fcm_token;
     
     if(!Array.isArray(customer_fcm_token)) {
       customer_fcm_token = [customer_fcm_token];
