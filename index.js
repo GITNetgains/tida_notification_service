@@ -83,7 +83,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
           .then((responseFCM) => {
             // Response is a message ID string.
             // console.log("FCM notification sent successfully:", responseFCM);
-            logger.info(responseFCM);
+            logger.info(responseFCM.message);
             // res.status(200).json({ message: "FCM notification sent successfully" });
           }).catch((error) => {
             console.error("Error sending FCM notification:", error.message);
@@ -139,7 +139,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
           .then((responseFCM) => {
             // Response is a message ID string.
             // console.log("FCM notification sent successfully:", responseFCM);
-            logger.info(responseFCM);
+            logger.info(responseFCM.message);
             // res.status(200).json({ message: "FCM notification sent successfully" });
           }).catch((error) => {
             console.error("Error sending FCM notification:", error.message);
@@ -174,7 +174,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
       await admin.messaging().send(message1).then((responseFCM) => {
         // Response is a message ID string.
         // console.log("FCM notification sent successfully:", responseFCM);
-        logger.info(responseFCM);
+        logger.info(responseFCM.message);
         // res.status(200).json({ message: "FCM notification sent successfully" });
       }).catch((error) => {
         // console.error("Error sending FCM notification:", error);
