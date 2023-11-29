@@ -5,6 +5,7 @@ const FormData = require("form-data");
 const serviceAccount = require("./tida_firebase_key.json");
 const certpath = admin.credential.cert(serviceAccount);
 const winston = require('winston');
+const { getDatabase } = require('firebase-admin/database');
 
 const levels = {
   error: 0,
@@ -28,6 +29,7 @@ const logger = winston.createLogger({
 
 admin.initializeApp({
   credential: certpath,
+  databaseURL: "https://tidasports-6bb99-default-rtdb.firebaseio.com/",
 });
 
 const server = express();
@@ -56,7 +58,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
       }
     );
 
-    let fcm_token = response.data.data.fcm_token;
+    let fcm_token = response.data.fcm_token;
     
     if(!Array.isArray(fcm_token)) {
       fcm_token = [fcm_token];
