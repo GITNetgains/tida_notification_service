@@ -29,13 +29,13 @@ const logger = winston.createLogger({
 
 admin.initializeApp({
   credential: certpath,
-  // databaseURL: "https://tidasports-6bb99-default-rtdb.firebaseio.com/",
+  databaseURL: "https://tidasports-6bb99-default-rtdb.firebaseio.com/",
 });
 
 const server = express();
 const axios = require("axios");
-// var db = admin.database();
-// const notificationRef = db.ref('/notifications');
+var db = admin.database();
+const notificationRef = db.ref('/notifications');
 
 server.get("/", (req, res) => {
   res.status(200).json({ "message": "Server is working" });
@@ -60,12 +60,16 @@ server.post("/partner_notification", express.json(), async (req, res) => {
       }
     );
 
-    // notificationRef.push().set({
-    //   tida_server_response: response,
-    //   request: req.body,
-    // });
+    const replaceAll  =(s="",f="",r="")=>  s.replace(new RegExp(f.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), r)
 
-    let fcm_token = response.data.fcm_token;
+    let fcm_token = response.data.data.fcm_token;
+
+    notificationRef.push().set(JSON.parse(replaceAll(JSON.stringify({
+      tida_server_response: response.data,
+      request: req.body,
+      fcm_token: fcm_token
+    }),"undefined","null")));
+    
     
     if(!Array.isArray(fcm_token)) {
       fcm_token = [fcm_token];
