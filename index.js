@@ -29,7 +29,7 @@ const logger = winston.createLogger({
 
 admin.initializeApp({
   credential: certpath,
-  databaseURL: "https://tidasports-6bb99-default-rtdb.firebaseio.com/",
+  databaseURL: "https://tidasports-60eaa-default-rtdb.firebaseio.com/",
 });
 
 const server = express();
@@ -51,7 +51,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
     const form = new FormData();
     form.append("userid", userid);
     const response = await axios.post(
-      "https://tidasports.com/secure/api/notification/find_fcm_token",
+      "https://tidasports.com/wp-json/tida/v1/notification/find_fcm_token",
       form,
       {
         headers: {
