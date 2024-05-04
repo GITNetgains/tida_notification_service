@@ -75,9 +75,10 @@ server.post("/partner_notification", express.json(), async (req, res) => {
       fcm_token = [fcm_token];
     }
 
-    for(let partner_token of fcm_token) {
+    /* for(let partner_token of fcm_token) {
+    } */
       const message = {
-        token: partner_token,
+        token: fcm_token[0],
         notification: {
           title: "Payment Update",
           body: "You have received a payment from a Tida customer ",
@@ -111,7 +112,6 @@ server.post("/partner_notification", express.json(), async (req, res) => {
         console.log(e.message);
         // res.status(500).json({ error: "Error sending FCM notification", "details": e.message });
       }
-    }
 
     // const customerForm = new FormData();
     // form.append("userid", customerUserId);
