@@ -1,4 +1,4 @@
-{
+/*{
   "type": "service_account",
   "project_id": "tidasports-60eaa",
   "private_key_id": "c054f70d1ab5dd8de63249ddb3fc9e78f67e6554",
@@ -10,4 +10,4 @@
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-sgci2%40tidasports-60eaa.iam.gserviceaccount.com",
   "universe_domain": "googleapis.com"
-}
+} */
