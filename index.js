@@ -66,6 +66,8 @@ server.post("/partner_notification", express.json(), async (req, res) => {
     /* for(let partner_token of fcm_token) {
     } */	
 	 order_status = response.data.data.order_status;
+        console.log(order_status);
+        console.log(response);
 	if(order_status == 'complete'){
 		let body_msg = 'You have received a payment from a Tida customer.';
 		let cust_body_msg = 'Your payment has been received in tidasports.';
@@ -73,6 +75,8 @@ server.post("/partner_notification", express.json(), async (req, res) => {
 		let body_msg = 'You have received a new booking from a Tida customer.';
 		let cust_body_msg = 'Your booking is successful in tidasports.';
 	}
+        console.log(body_msg);
+        console.log(cust_body_msg);
       const message = {
         token: fcm_token[0],
         notification: {
