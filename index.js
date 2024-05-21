@@ -38,12 +38,15 @@ server.get("/", (req, res) => {
 server.post("/check", (req, res) => {
   console.log(req.body);
 })
+server.post("/update_order", express.json(), async (req, res) => {	
+})
 server.post("/partner_notification", express.json(), async (req, res) => {	
   let body_msg, cust_body_msg;
   const { userid, fcmToken, order_id, customerUserId } = req.body;
   try {
     const form = new FormData();
     form.append("userid", userid);
+    form.append("order_id", order_id);
     const response = await axios.post(
       "https://tidasports.com/wp-json/tida/v1/notification/find_fcm_token",
       form,
@@ -66,7 +69,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
     /* for(let partner_token of fcm_token) {
     } */	
 	const order_status = response.data.data.order_status;
-        console.log(order_status);
+        console.log(response);
         console.log(response.data.data);
 	if(order_status == 'complete'){
 		let body_msg = 'You have received a payment from a Tida customer.';
