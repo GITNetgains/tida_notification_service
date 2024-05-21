@@ -91,7 +91,7 @@ server.post("/update_order", (req, res) => {
             // Response is a message ID string.
             // console.log("FCM notification sent successfully:", responseFCM);
             logger.info(responseFCM);
-            // res.status(200).json({ message: "FCM notification sent successfully" });
+            // res.status(200).json({ message: "FCM notification sent successfully." });
           }).catch((error) => {
             console.error("Error sending FCM notification:", error.message);
             logger.error({
@@ -123,7 +123,7 @@ server.post("/update_order", (req, res) => {
         // Response is a message ID string.
         // console.log("FCM notification sent successfully:", responseFCM);
         logger.info(responseFCM);
-        // res.status(200).json({ message: "FCM notification sent successfully" });
+        // res.status(200).json({ message: "FCM notification sent successfully.." });
       }).catch((error) => {
         // console.error("Error sending FCM notification:", error);
         logger.error({
@@ -146,7 +146,7 @@ server.post("/update_order", (req, res) => {
       .status(500)
       .json({ error: "An error occurred while making the API request" });
   }
-  res.status(200).json({ message: "1 FCM notification sent successfully" ,order_status:order_status,body_msg:body_msg,cust_body_msg:cust_body_msg });
+  res.status(200).json({ message: "1 FCM notification sent successfully..." ,order_status:order_status,body_msg:body_msg,cust_body_msg:cust_body_msg });
 })
 server.post("/partner_notification", express.json(), async (req, res) => {
   const { userid, fcmToken, order_id, customerUserId } = req.body;
@@ -201,7 +201,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
             // Response is a message ID string.
             // console.log("FCM notification sent successfully:", responseFCM);
             logger.info(responseFCM);
-            // res.status(200).json({ message: "FCM notification sent successfully" });
+            // res.status(200).json({ message: "FCM notification sent successfully...." });
           }).catch((error) => {
             console.error("Error sending FCM notification:", error.message);
             logger.error({
@@ -233,7 +233,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
         // Response is a message ID string.
         // console.log("FCM notification sent successfully:", responseFCM);
         logger.info(responseFCM);
-        // res.status(200).json({ message: "FCM notification sent successfully"  });
+        // res.status(200).json({ message: "FCM notification sent successfully!"  });
       }).catch((error) => {
         // console.error("Error sending FCM notification:", error);
         logger.error({
