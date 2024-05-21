@@ -48,6 +48,9 @@ let body_msg, cust_body_msg;
       "https://tidasports.com/wp-json/tida/v1/notification/update_order_status",
       form,
       {
+       headers: {
+          ...form.getHeaders(),
+        },
       }
     );
     let order_status = response.data.data.order_status;
