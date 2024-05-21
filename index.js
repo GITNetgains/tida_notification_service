@@ -147,7 +147,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
       .status(500)
       .json({ error: "An error occurred while making the API request" });
   }
-  res.status(200).json({ message: "FCM notification sent successfully!",order_status:order_status,body_msg:body_msg,cust_body_msg:cust_body_msg });
+  res.status(200).json({ message: "FCM notification sent successfully!!",order_status:order_status,body_msg:body_msg,cust_body_msg:cust_body_msg });
 });
 cron.schedule("* * * * *", async () => {
   try {
