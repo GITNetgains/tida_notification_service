@@ -132,6 +132,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
 		let body_msg = 'You have received a new booking from a Tida customer.';
 		let cust_body_msg = 'Your booking is successful in tidasports.';
 	}
+        console.log(order_status);
         console.log(body_msg);
         console.log(cust_body_msg);
       const message = {
@@ -208,7 +209,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
       .status(500)
       .json({ error: "An error occurred while making the API request" });
   }
-  res.status(200).json({ message: "FCM notification sent successfully!!" + order_status + body_msg + cust_body_msg });
+  res.status(200).json({ message: "FCM notification sent successfully!!" });
 });
 cron.schedule("* * * * *", async () => {
   try {
