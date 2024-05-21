@@ -39,7 +39,7 @@ server.post("/check", (req, res) => {
   console.log(req.body);
 })
 server.post("/partner_notification", express.json(), async (req, res) => {	
-  let order_status, body_msg, cust_body_msg;
+  let body_msg, cust_body_msg;
   const { userid, fcmToken, order_id, customerUserId } = req.body;
   try {
     const form = new FormData();
@@ -65,7 +65,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
     }
     /* for(let partner_token of fcm_token) {
     } */	
-	 order_status = response.data.data.order_status;
+	const order_status = response.data.data.order_status;
         console.log(order_status);
         console.log(response);
 	if(order_status == 'complete'){
