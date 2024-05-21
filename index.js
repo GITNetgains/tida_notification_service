@@ -6,6 +6,7 @@ const serviceAccount = require("./tida_firebase_key.json");
 const certpath = admin.credential.cert(serviceAccount);
 const winston = require('winston');
 const { getDatabase } = require('firebase-admin/database');
+
 const levels = {
   error: 0,
   warn: 1,
@@ -15,6 +16,7 @@ const levels = {
   debug: 5,
   silly: 6
 };
+
 const logger = winston.createLogger({
   level: 'info',
   format: winston.format.json(),
@@ -24,50 +26,62 @@ const logger = winston.createLogger({
     new winston.transports.File({ filename: 'error.log', level: 'error' }),
   ],
 });
+
 admin.initializeApp({
   credential: certpath,
   databaseURL: "https://tidasports-60eaa-default-rtdb.firebaseio.com/",
 });
+
 const server = express();
 const axios = require("axios");
 var db = admin.database();
 const notificationRef = db.ref('/notifications');
+
 server.get("/", (req, res) => {
   res.status(200).json({ "message": "Server is working" });
 })
+
 server.post("/check", (req, res) => {
   console.log(req.body);
 })
-server.post("/update_order", express.json(), async (req, res) => {
-let body_msg, cust_body_msg;
+
+server.post("/partner_notification", express.json(), async (req, res) => {
   const { userid, fcmToken, order_id, customerUserId } = req.body;
   try {
     const form = new FormData();
-    form.append("order_id", order_id);
+    form.append("userid", userid);
     const response = await axios.post(
-      "https://tidasports.com/wp-json/tida/v1/notification/update_order_status",
+      "https://tidasports.com/wp-json/tida/v1/notification/find_fcm_token",
       form,
       {
+        headers: {
+          ...form.getHeaders(),
+        },
       }
     );
-    let order_status = response.data.data.order_status;
-	console.log(response);
-	console.log(response.data.data);
-	if(order_status == 'completed'){
-		body_msg = 'You have received a payment from a Tida customer.';
-		cust_body_msg = 'Your payment has been received in tidasports.';
-	}else{
-		body_msg = 'You have received a new booking from a Tida customer.';
-		cust_body_msg = 'Your booking is successful in tidasports.';
-	}
-        console.log(order_status);
-        console.log(body_msg);
-        console.log(cust_body_msg);
+
+    const replaceAll  =(s="",f="",r="")=>  s.replace(new RegExp(f.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), r)
+
+    let fcm_token = response.data.data.fcm_token;
+
+    notificationRef.push().set(JSON.parse(replaceAll(JSON.stringify({
+      tida_server_response: response.data,
+      request: req.body,
+      fcm_token: fcm_token
+    }),"undefined","null")));
+    
+    
+    if(!Array.isArray(fcm_token)) {
+      fcm_token = [fcm_token];
+    }
+
+    /* for(let partner_token of fcm_token) {
+    } */
       const message = {
         token: fcm_token[0],
         notification: {
           title: "Payment Update",
-          body: body_msg,
+          body: "You have received a payment from a Tida customer ",
         },
         data: {
           click_action: "FLUTTER_NOTIFICATION_CLICK",
@@ -75,25 +89,90 @@ let body_msg, cust_body_msg;
           order_id: order_id.toString()
         }
       };
+  
       console.log(message);
+  
       try {
         await admin.messaging().send(message)
           .then((responseFCM) => {
+            // Response is a message ID string.
+            // console.log("FCM notification sent successfully:", responseFCM);
             logger.info(responseFCM);
+            // res.status(200).json({ message: "FCM notification sent successfully" });
           }).catch((error) => {
             console.error("Error sending FCM notification:", error.message);
             logger.error({
               "error": error.message,
+              // "response_from_fcm": responseFCM,
+              // "response_from_server": response
             })
+            // res.status(500).json({ error: "Error sending FCM notification", "details": error.message });
           });
       } catch (e) {
         console.log(e.message);
+        // res.status(500).json({ error: "Error sending FCM notification", "details": e.message });
       }
+
+    // const customerForm = new FormData();
+    // form.append("userid", customerUserId);
+    // const customerResponse = await axios.post(
+    //   "https://tidasports.com/secure/api/notification/find_fcm_token",
+    //   customerForm,
+    //   {
+    //     headers: {
+    //       ...form.getHeaders(),
+    //     },
+    //   }
+    // );
+
+    // let customer_fcm_token = customerResponse.data.data.fcm_token;
+    
+    // if(!Array.isArray(customer_fcm_token)) {
+    //   customer_fcm_token = [customer_fcm_token];
+    // }
+
+    // for(let customer_token of customer_fcm_token) {
+    //   let message = {
+    //     token: customer_token,
+    //     notification: {
+    //       title: "Payment Update",
+    //       body: "You booking was successful ",
+    //     },
+    //     data: {
+    //       click_action: "FLUTTER_NOTIFICATION_CLICK",
+    //       sound: "default",
+    //       order_id: order_id.toString()
+    //     }
+    //   };
+  
+    //   console.log(message);
+  
+    //   try {
+    //     await admin.messaging().send(message)
+    //       .then((responseFCM) => {
+    //         // Response is a message ID string.
+    //         // console.log("FCM notification sent successfully:", responseFCM);
+    //         logger.info(responseFCM.message);
+    //         // res.status(200).json({ message: "FCM notification sent successfully" });
+    //       }).catch((error) => {
+    //         console.error("Error sending FCM notification:", error.message);
+    //         logger.error({
+    //           "error": error.message,
+    //           // "response_from_fcm": responseFCM,
+    //           // "response_from_server": response
+    //         })
+    //       });
+    //   } catch (e) {
+    //     console.log(e.message);
+    //     // res.status(500).json({ error: "Error sending FCM notification", "details": error });
+    //   }
+    // }
+
     const message1 = {
       token: fcmToken,
       notification: {
         title: "Payment Update",
-        body: cust_body_msg,
+        body: "You booking was successful ",
       },
       data: {
         click_action: "FLUTTER_NOTIFICATION_CLICK",
@@ -101,17 +180,29 @@ let body_msg, cust_body_msg;
         order_id: order_id.toString()
       }
     };
+
+    // console.log(message1);
+
     try {
       await admin.messaging().send(message1).then((responseFCM) => {
+        // Response is a message ID string.
+        // console.log("FCM notification sent successfully:", responseFCM);
         logger.info(responseFCM);
+        // res.status(200).json({ message: "FCM notification sent successfully" });
       }).catch((error) => {
+        // console.error("Error sending FCM notification:", error);
         logger.error({
           "error": error.message,
+          // "response_from_fcm": responseFCM,
+          // "response_from_server": response
         })
+        // res.status(500).json({ error: "Error sending FCM notification", "details": error });
       });
     } catch (e) {
       console.log(e.message);
+      // res.status(500).json({ error: "Error sending FCM notification", "details": e });
     }
+
   } catch (error) {
     console.error("An error occurred while making the API request:", error.message);
     logger.error({
@@ -121,15 +212,15 @@ let body_msg, cust_body_msg;
       .status(500)
       .json({ error: "An error occurred while making the API request" });
   }
-  res.status(200).json({ message: "FCM notification sent successfully!!" });
-})
-server.post("/partner_notification", express.json(), async (req, res) => {
+  res.status(200).json({ message: "FCM notification sent successfully" });
+});
+server.post("/update_order", (req, res) => {
   const { userid, fcmToken, order_id, customerUserId } = req.body;
   try {
     const form = new FormData();
-    form.append({"userid": userid,"order_id":order_id});
+    form.append("userid", userid);
     const response = await axios.post(
-      "https://tidasports.com/wp-json/tida/v1/notification/find_fcm_token",
+      "https://tidasports.com/wp-json/tida/v1/notification/update_order_status",
       form,
       {
         headers: {
@@ -148,10 +239,15 @@ server.post("/partner_notification", express.json(), async (req, res) => {
       fcm_token = [fcm_token];
     }
     /* for(let partner_token of fcm_token) {
-    } */	
-      console.log(response.data);
-	const body_msg = 'You have received a payment from a Tida customer.';
-	const cust_body_msg = 'Your payment has been received in tidasports.';
+    } */
+	let order_status = response.data.data.order_status;
+	if(order_status == 'complete'){
+		let body_msg = 'You have received a payment from a Tida customer.';
+		let cust_body_msg = 'Your payment has been received in tidasports.';
+	}else{
+		let body_msg = 'You have received a new booking from a Tida customer.';
+		let cust_body_msg = 'Your booking is successful in tidasports.';
+	}
       const message = {
         token: fcm_token[0],
         notification: {
@@ -203,7 +299,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
         // Response is a message ID string.
         // console.log("FCM notification sent successfully:", responseFCM);
         logger.info(responseFCM);
-        // res.status(200).json({ message: "FCM notification sent successfully"  });
+        // res.status(200).json({ message: "FCM notification sent successfully" });
       }).catch((error) => {
         // console.error("Error sending FCM notification:", error);
         logger.error({
@@ -226,18 +322,19 @@ server.post("/partner_notification", express.json(), async (req, res) => {
       .status(500)
       .json({ error: "An error occurred while making the API request" });
   }
-  res.status(200).json({ message: "FCM notification sent successfully" });
-});
+  res.status(200).json({ message: "1 FCM notification sent successfully" ,order_status:order_status,body_msg:body_msg,cust_body_msg:cust_body_msg });
+})
 cron.schedule("* * * * *", async () => {
   try {
     const response = await axios.post(
-      "https://tidasports.com/wp-json/tida/v1/notification/get_booking_details",
+      "https://tidasports.com/secure/api/notification/get_booking_details",
       {}
     );
     // console.log("Response from API:", response.data);
     logger.info("Response from API:", response.data);
     const bookingDetails = response.data.data;
     const currentTime = new Date();
+
     if (bookingDetails && Array.isArray(bookingDetails)) {
       for (const bookingData of bookingDetails) {
         const startTime = new Date(
@@ -284,6 +381,7 @@ cron.schedule("* * * * *", async () => {
     // console.error("An error occurred while making the API request:", error);
   }
 });
+
 server.listen(5001, () => {
   // console.log("Server is running on port 5001");
   logger.info("Server is running on port 5001");
