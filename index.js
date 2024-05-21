@@ -38,117 +38,8 @@ server.get("/", (req, res) => {
 server.post("/check", (req, res) => {
   console.log(req.body);
 })
-server.post("/update_order", express.json(), async  (req, res) => {
-  const { userid, fcmToken, order_id, customerUserId } = req.body;
-  try {
-    const form = new FormData();
-    form.append("userid", userid);
-    const response = await axios.post(
-      "https://tidasports.com/wp-json/tida/v1/notification/update_order_status",
-      form,
-      {
-        headers: {
-          ...form.getHeaders(),
-        },
-      }
-    );
-    const replaceAll  =(s="",f="",r="")=>  s.replace(new RegExp(f.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), r)
-    let fcm_token = response.data.data.fcm_token;
-    notificationRef.push().set(JSON.parse(replaceAll(JSON.stringify({
-      tida_server_response: response.data,
-      request: req.body,
-      fcm_token: fcm_token
-    }),"undefined","null")));
-    if(!Array.isArray(fcm_token)) {
-      fcm_token = [fcm_token];
-    }
-    /* for(let partner_token of fcm_token) {
-    } */
-	let order_status = response.data.data.order_status;
-	if(order_status == 'complete'){
-		let body_msg = 'You have received a payment from a Tida customer.';
-		let cust_body_msg = 'Your payment has been received in tidasports.';
-	}else{
-		let body_msg = 'You have received a new booking from a Tida customer.';
-		let cust_body_msg = 'Your booking is successful in tidasports.';
-	}
-      const message = {
-        token: fcm_token[0],
-        notification: {
-          title: "Payment Update",
-          body: body_msg,
-        },
-        data: {
-          click_action: "FLUTTER_NOTIFICATION_CLICK",
-          sound: "default",
-          order_id: order_id.toString()
-        }
-      };
-      console.log(message);
-      try {
-        await admin.messaging().send(message)
-          .then((responseFCM) => {
-            // Response is a message ID string.
-            // console.log("FCM notification sent successfully:", responseFCM);
-            logger.info(responseFCM);
-            // res.status(200).json({ message: "FCM notification sent successfully." });
-          }).catch((error) => {
-            console.error("Error sending FCM notification:", error.message);
-            logger.error({
-              "error": error.message,
-              // "response_from_fcm": responseFCM,
-              // "response_from_server": response
-            })
-            // res.status(500).json({ error: "Error sending FCM notification", "details": error.message });
-          });
-      } catch (e) {
-        console.log(e.message);
-        // res.status(500).json({ error: "Error sending FCM notification", "details": e.message });
-      }
-    const message1 = {
-      token: fcmToken,
-      notification: {
-        title: "Payment Update",
-        body: cust_body_msg,
-      },
-      data: {
-        click_action: "FLUTTER_NOTIFICATION_CLICK",
-        sound: "default",
-        order_id: order_id.toString()
-      }
-    };
-    // console.log(message1);
-    try {
-      await admin.messaging().send(message1).then((responseFCM) => {
-        // Response is a message ID string.
-        // console.log("FCM notification sent successfully:", responseFCM);
-        logger.info(responseFCM);
-        // res.status(200).json({ message: "FCM notification sent successfully.." });
-      }).catch((error) => {
-        // console.error("Error sending FCM notification:", error);
-        logger.error({
-          "error": error.message,
-          // "response_from_fcm": responseFCM,
-          // "response_from_server": response
-        })
-        // res.status(500).json({ error: "Error sending FCM notification", "details": error });
-      });
-    } catch (e) {
-      console.log(e.message);
-      // res.status(500).json({ error: "Error sending FCM notification", "details": e });
-    }
-  } catch (error) {
-    console.error("An error occurred while making the API request:", error.message);
-    logger.error({
-      "error": error.message
-    });
-    res
-      .status(500)
-      .json({ error: "An error occurred while making the API request" });
-  }
-  res.status(200).json({ message: "1 FCM notification sent successfully..." ,order_status:order_status,body_msg:body_msg,cust_body_msg:cust_body_msg });
-})
-server.post("/partner_notification", express.json(), async (req, res) => {
+server.post("/partner_notification", express.json(), async (req, res) => {	
+  let order_status, body_msg, cust_body_msg;
   const { userid, fcmToken, order_id, customerUserId } = req.body;
   try {
     const form = new FormData();
@@ -174,7 +65,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
     }
     /* for(let partner_token of fcm_token) {
     } */	
-	let order_status = response.data.data.order_status;
+	 order_status = response.data.data.order_status;
 	if(order_status == 'complete'){
 		let body_msg = 'You have received a payment from a Tida customer.';
 		let cust_body_msg = 'Your payment has been received in tidasports.';
@@ -201,7 +92,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
             // Response is a message ID string.
             // console.log("FCM notification sent successfully:", responseFCM);
             logger.info(responseFCM);
-            // res.status(200).json({ message: "FCM notification sent successfully...." });
+            // res.status(200).json({ message: "FCM notification sent successfully" });
           }).catch((error) => {
             console.error("Error sending FCM notification:", error.message);
             logger.error({
@@ -233,7 +124,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
         // Response is a message ID string.
         // console.log("FCM notification sent successfully:", responseFCM);
         logger.info(responseFCM);
-        // res.status(200).json({ message: "FCM notification sent successfully!"  });
+        // res.status(200).json({ message: "FCM notification sent successfully"  });
       }).catch((error) => {
         // console.error("Error sending FCM notification:", error);
         logger.error({
@@ -303,7 +194,7 @@ cron.schedule("* * * * *", async () => {
               console.log("FCM notification sent successfully:", response);
               res
                 .status(200)
-                .json({ message: "FCM notification sent successfully!!" });
+                .json({ message: "FCM notification sent successfully" });
             }
           });
         }
