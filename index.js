@@ -67,7 +67,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
     } */	
 	const order_status = response.data.data.order_status;
         console.log(order_status);
-        console.log(response);
+        console.log(response.data.data);
 	if(order_status == 'complete'){
 		let body_msg = 'You have received a payment from a Tida customer.';
 		let cust_body_msg = 'Your payment has been received in tidasports.';
