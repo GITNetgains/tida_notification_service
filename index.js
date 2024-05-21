@@ -128,8 +128,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
   const { userid, fcmToken, order_id, customerUserId } = req.body;
   try {
     const form = new FormData();
-    form.append("userid", userid);
-    form.append("order_id", order_id);
+    form.append({"userid": userid,"order_id": order_id});
     const response = await axios.post(
       "https://tidasports.com/wp-json/tida/v1/notification/find_fcm_token",
       form,
