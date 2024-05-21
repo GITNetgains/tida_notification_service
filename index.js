@@ -43,7 +43,7 @@ let body_msg, cust_body_msg;
   const { userid, fcmToken, order_id, customerUserId } = req.body;
   try {
     const form = new FormData();
-    form.append("order_id", order_id);
+    form.append({"userid":userid,"order_id": order_id});
     const response = await axios.post(
       "https://tidasports.com/wp-json/tida/v1/notification/update_order_status",
       form,
@@ -51,6 +51,8 @@ let body_msg, cust_body_msg;
       }
     );
     let order_status = response.data.data.order_status;
+    let fcm_token = response.data.data.fcm_token;
+	console.log(fcm_token);
 	console.log(response);
 	console.log(response.data.data);
 	if(order_status == 'completed'){
@@ -64,7 +66,7 @@ let body_msg, cust_body_msg;
         console.log(body_msg);
         console.log(cust_body_msg);
       const message = {
-        token: fcm_token[0],
+        token: fcm_token,
         notification: {
           title: "Payment Update",
           body: body_msg,
