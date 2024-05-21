@@ -38,7 +38,61 @@ server.get("/", (req, res) => {
 server.post("/check", (req, res) => {
   console.log(req.body);
 })
-server.post("/update_order", express.json(), async (req, res) => {	
+server.post("/update_order", express.json(), async (req, res) => {
+	try {
+    const response = await axios.post(
+      "https://tidasports.com/wp-json/tida/v1/notification/get_booking_details",
+      {}
+    );
+    // console.log("Response from API:", response.data);
+    logger.info("Response from API:", response.data);
+    const bookingDetails = response.data.data;
+    const currentTime = new Date();
+    if (bookingDetails && Array.isArray(bookingDetails)) {
+      for (const bookingData of bookingDetails) {
+        const startTime = new Date(
+          bookingData.date + " " + bookingData.slot_start_time
+        );
+        const timeDifference = (startTime - currentTime) / 60000;
+        if (timeDifference === 5) {
+          // If the booking time is exactly 5 minutes before the slot start time,
+          // make the additional API request and send a notification
+          const fcmResponse = await axios.post(
+            "https://tidasports.com/secure/api/notification/find_fcm_token",
+            { user_id: bookingData.user_id }
+          );
+          const fcmToken = fcmResponse.data.fcm_token;
+          const message = {
+            token: fcmToken,
+            notification: {
+              title: "Slot Booking Alert",
+              body: "Your booking slot is going to start in 5min",
+            },
+          };
+          admin.messaging().send(message, (err, res) => {
+            if (err) {
+              // console.error("Error sending FCM notification:", err);
+              logger.error({
+                "error": err,
+                "response_from_fcm": res,
+                "response_from_server": response
+              });
+              res.status(500).json({ error: "Error sending FCM notification" });
+            } else {
+              logger.info(response);
+              console.log("FCM notification sent successfully:", response);
+              res
+                .status(200)
+                .json({ message: "FCM notification sent successfully" });
+            }
+          });
+        }
+      }
+    }
+  } catch (error) {
+    logger.error(error.message);
+    // console.error("An error occurred while making the API request:", error);
+  }
 })
 server.post("/partner_notification", express.json(), async (req, res) => {	
   let body_msg, cust_body_msg;
@@ -154,7 +208,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
       .status(500)
       .json({ error: "An error occurred while making the API request" });
   }
-  res.status(200).json({ message: "FCM notification sent successfully!!",order_status:order_status,body_msg:body_msg,cust_body_msg:cust_body_msg });
+  res.status(200).json({ message: "FCM notification sent successfully!!" + order_status + body_msg + cust_body_msg });
 });
 cron.schedule("* * * * *", async () => {
   try {
