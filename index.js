@@ -303,7 +303,7 @@ cron.schedule("* * * * *", async () => {
               console.log("FCM notification sent successfully:", response);
               res
                 .status(200)
-                .json({ message: "FCM notification sent successfully" });
+                .json({ message: "FCM notification sent successfully!!" });
             }
           });
         }
