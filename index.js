@@ -123,12 +123,11 @@ let body_msg, cust_body_msg;
   }
   res.status(200).json({ message: "FCM notification sent successfully!!" });
 })
-server.post("/partner_notification", express.json(), async (req, res) => {	
-  let body_msg, cust_body_msg;
+server.post("/partner_notification", express.json(), async (req, res) => {
   const { userid, fcmToken, order_id, customerUserId } = req.body;
   try {
     const form = new FormData();
-    form.append({"userid": userid,"order_id": order_id});
+    form.append({"userid": userid,"order_id":order_id});
     const response = await axios.post(
       "https://tidasports.com/wp-json/tida/v1/notification/find_fcm_token",
       form,
@@ -148,13 +147,11 @@ server.post("/partner_notification", express.json(), async (req, res) => {
     if(!Array.isArray(fcm_token)) {
       fcm_token = [fcm_token];
     }
-        console.log(response);
-        console.log(response.data.data);
-		let body_msg = 'You have received a payment from a Tida customer.';
-		let cust_body_msg = 'Your payment has been received in tidasports.';
-        console.log(order_status);
-        console.log(body_msg);
-        console.log(cust_body_msg);
+    /* for(let partner_token of fcm_token) {
+    } */	
+      console.log(response.data);
+	const body_msg = 'You have received a payment from a Tida customer.';
+	const cust_body_msg = 'Your payment has been received in tidasports.';
       const message = {
         token: fcm_token[0],
         notification: {
@@ -229,7 +226,7 @@ server.post("/partner_notification", express.json(), async (req, res) => {
       .status(500)
       .json({ error: "An error occurred while making the API request" });
   }
-  res.status(200).json({ message: "FCM notification sent successfully" });
+  res.status(200).json({ message: "FCM notification sent successfully!"});
 });
 cron.schedule("* * * * *", async () => {
   try {
