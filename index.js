@@ -38,7 +38,7 @@ server.get("/", (req, res) => {
 server.post("/check", (req, res) => {
   console.log(req.body);
 })
-server.post("/update_order", (req, res) => {
+server.post("/update_order", express.json(), async  (req, res) => {
   const { userid, fcmToken, order_id, customerUserId } = req.body;
   try {
     const form = new FormData();
