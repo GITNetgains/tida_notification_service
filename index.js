@@ -69,15 +69,13 @@ let body_msg, cust_body_msg;
     if(!Array.isArray(fcm_token)) {
       fcm_token = [fcm_token];
     }
-
-    if (order_status === 'completed') {
-      body_msg = 'You have received a payment from a Tida customer.';
-      cust_body_msg = 'Your payment has been received in tidasports.';
-    } else {
+ if (order_status === 'completed') {
       body_msg = 'You have received a new booking from a Tida customer.';
-      cust_body_msg = 'Your booking is successful in tidasports.';
+      cust_body_msg = 'Your payment is confirmed in tidasports.';
+    } else {
+      body_msg = 'You have received a new booking with pending payment from a Tida customer.';
+      cust_body_msg = 'Your booking is created in tidasports.';
     }
-  
     const message = {
       token: fcm_token[0],
       notification: {
