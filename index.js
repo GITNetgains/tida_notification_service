@@ -60,6 +60,7 @@ let body_msg, cust_body_msg;
 
     let order_status = response.data.data.order_status;
     let fcm_token = response.data.data.fcm_token;
+    let order_type = response.data.data.order_type;
     /*const replaceAll  =(s="",f="",r="")=>  s.replace(new RegExp(f.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), r)
     notificationRef.push().set(JSON.parse(replaceAll(JSON.stringify({
       tida_server_response: response.data,
@@ -86,6 +87,7 @@ let body_msg, cust_body_msg;
         click_action: "FLUTTER_NOTIFICATION_CLICK",
         sound: "default",
         order_id: order_id.toString(),
+	order_type: order_type,
       },
     };
     console.log(message);
@@ -106,6 +108,7 @@ let body_msg, cust_body_msg;
         click_action: "FLUTTER_NOTIFICATION_CLICK",
         sound: "default",
         order_id: order_id.toString(),
+	order_type: order_type,
       },
     };
 
